@@ -10,10 +10,7 @@ This is a chat application that allows users to communicate with each other in r
 ## Technologies 
    - GoLang
 ## Installation 
-   1. Clone the repository ```bash git clone https://github.com/2f4ek/lets-go-chat``` 
-   2. Go to the main app directory ```cd cmd/app``` 
-   3. Install dependencies ```bash go get``` 
-   4. Run the server ```bash go run main.go``` 
+   To Import a package just run the get command ```go get github.com/2f4ek/lets-go-chat```
 ## Usage 
 Please note that currently only the features described below are available. All other functionality is under development.
 ## Functions: 
