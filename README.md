@@ -47,5 +47,4 @@ This function is used to check if a given password matches a given hash.
 ```go
 isMatch := CheckPasswordHash("password", hashedPassword)
 ```
-
 ### License This project is licensed under the MIT License - see the [LICENCE](LICENCE.md) file for details.
