@@ -23,7 +23,7 @@ func TestHashPasswordFailure(t *testing.T) {
 }
 
 func TestCheckPasswordHash(t *testing.T) {
-	bcryptHash, _ := bcrypt.GenerateFromPassword([]byte(password), cost)
+	bcryptHash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if status := CheckPasswordHash(password, string(bcryptHash)); status != true {
 		t.Errorf("Hashed passwords mismatch")
 	}
