@@ -9,8 +9,13 @@ This is a chat application that allows users to communicate with each other in r
 - Real-time messaging (under development)
 ## Technologies 
    - GoLang
-## Installation 
-   To Import a hasher package just run the get command ```go get github.com/2f4ek/lets-go-chat/pkg/hasher```
+## Installation
+   1. Clone the repository ```bash git clone https://github.com/2f4ek/lets-go-chat```
+   2. Go to the main app directory ```cd cmd/app```
+   3. Install dependencies ```bash go get```
+   4. Run the server ```bash go run main.go```
+## Import
+To Import a hasher package just run the get command ```go get github.com/2f4ek/lets-go-chat/pkg/hasher```
 ## Usage 
 Please note that currently only the features described below are available. All other functionality is under development.
 ## Functions: 
