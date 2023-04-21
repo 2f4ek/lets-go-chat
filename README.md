@@ -28,7 +28,7 @@ This function is used to hash a user's password for security purposes.
 hashedPassword := HashPassword("password") 
 ```
 ###
-### [CheckPasswordHash](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L20)
+### [CheckPasswordHash](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L19)
 ```go
 CheckPasswordHash(password, hash string) bool
 ```
