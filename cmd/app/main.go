@@ -7,7 +7,7 @@ import (
 
 func main() {
 	password := "password"
-	hashedPassword := hasher.HashPassword(password)
+	hashedPassword, _ := hasher.HashPassword(password)
 
 	fmt.Println("Password:", password)
 	fmt.Println("Hash:", hashedPassword)

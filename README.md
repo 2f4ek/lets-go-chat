@@ -7,14 +7,14 @@ This is a chat application that allows users to communicate with each other in r
 ## Technologies 
    - GoLang
 ## Installation 
-   1. Clone the repository ```bash git clone https://github.com/2f4ek/lets-go-chat ``` 
+   1. Clone the repository ```bash git clone https://github.com/2f4ek/lets-go-chat``` 
    2. Go to the main app directory ```cd cmd/app``` 
    3. Install dependencies ```bash go get``` 
    4. Run the server ```bash go run main.go``` 
 ## Usage 
 Please note that currently only the features described below are available. All other functionality is under development.
 ## Functions: 
-### HashPassword
+### [HashPassword](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L10)
 ```go 
 func HashPassword(password string) string
 ``` 
@@ -28,7 +28,7 @@ This function is used to hash a user's password for security purposes.
 hashedPassword := HashPassword("password") 
 ```
 ###
-### CheckPasswordHash
+### [CheckPasswordHash](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L20)
 ```go
 CheckPasswordHash(password, hash string) bool
 ```

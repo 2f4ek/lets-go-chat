@@ -5,16 +5,15 @@ import (
 	"log"
 )
 
-const cost = 14
+const cost = 10
 
-func HashPassword(password string) string {
+func HashPassword(password string) (string, error) {
 	var bytes, err = bcrypt.GenerateFromPassword([]byte(password), cost)
-
 	if err != nil {
-		log.Fatal("Server error while password hash:")
+		log.Fatal("Server error while password hash")
 	}
 
-	return string(bytes)
+	return string(bytes), err
 }
 
 func CheckPasswordHash(password, hash string) bool {
