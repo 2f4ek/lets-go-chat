@@ -14,6 +14,7 @@ This is a chat application that allows users to communicate with each other in r
 ## Usage 
 Please note that currently only the features described below are available. All other functionality is under development.
 ## Functions: 
+### HashPassword
 ```go 
 func HashPassword(password string) string
 ``` 
@@ -26,8 +27,8 @@ This function is used to hash a user's password for security purposes.
 ```go 
 hashedPassword := HashPassword("password") 
 ```
-
-# Function:
+###
+### CheckPasswordHash
 ```go
 CheckPasswordHash(password, hash string) bool
 ```
