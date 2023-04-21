@@ -17,7 +17,7 @@ This is a chat application that allows users to communicate with each other in r
 ## Usage 
 Please note that currently only the features described below are available. All other functionality is under development.
 ## Functions: 
-### [HashPassword](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L10)
+### func [HashPassword](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L10)
 ```go 
 func HashPassword(password string) string
 ``` 
@@ -31,7 +31,7 @@ This function is used to hash a user's password for security purposes.
 hashedPassword := HashPassword("password") 
 ```
 ###
-### [CheckPasswordHash](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L19)
+### func [CheckPasswordHash](https://github.com/2f4ek/lets-go-chat/blob/main/pkg/hasher/hasher.go#L19)
 ```go
 CheckPasswordHash(password, hash string) bool
 ```
