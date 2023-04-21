@@ -10,7 +10,7 @@ This is a chat application that allows users to communicate with each other in r
 ## Technologies 
    - GoLang
 ## Installation 
-   To Import a package just run the get command ```go get github.com/2f4ek/lets-go-chat```
+   To Import a hasher package just run the get command ```github.com/2f4ek/lets-go-chat/pkg/hasher```
 ## Usage 
 Please note that currently only the features described below are available. All other functionality is under development.
 ## Functions: 
