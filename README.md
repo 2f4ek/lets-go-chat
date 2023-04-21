@@ -1,4 +1,5 @@
 # Lets GO Chat
+[![Go Reference](https://pkg.go.dev/badge/github.com/2f4ek/lets-go-chat.svg)](https://pkg.go.dev/github.com/2f4ek/lets-go-chat)
 ## Description
 This is a chat application that allows users to communicate with each other in real-time. 
 ## Features
