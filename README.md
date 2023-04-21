@@ -1,6 +1,6 @@
 # Let's GO Chat
 [![Go Reference](https://pkg.go.dev/badge/github.com/2f4ek/lets-go-chat.svg)](https://pkg.go.dev/github.com/2f4ek/lets-go-chat)
-[![Go Report Card](https://goreportcard.com/report/github.com/2f4ek/lets-go-chat)](https://goreportcard.com/report/github.com/2f4ek/lets-go-chat)
+[![Go Report Card](https://goreportcard.com/badge/github.com/2f4ek/lets-go-chat)](https://goreportcard.com/report/github.com/2f4ek/lets-go-chat)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ## Description
 This is a chat application that allows users to communicate with each other in real-time. 
