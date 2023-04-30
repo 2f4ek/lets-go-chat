@@ -9,5 +9,6 @@ func main() {
 	router := gin.Default()
 	router.POST("/user", handlers.RegisterUser)
 	router.POST("/user/login", handlers.LoginUser)
+	
 	router.Run()
 }
