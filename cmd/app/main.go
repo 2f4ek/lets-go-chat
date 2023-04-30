@@ -1,17 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"github.com/2f4ek/lets-go-chat/pkg/hasher"
+	"github.com/2f4ek/lets-go-chat/internal/handlers"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	password := "password"
-	hashedPassword, _ := hasher.HashPassword(password)
-
-	fmt.Println("Password:", password)
-	fmt.Println("Hash:", hashedPassword)
-
-	isMatch := hasher.CheckPasswordHash(password, hashedPassword)
-	fmt.Println("Match:   ", isMatch)
+	router := gin.Default()
+	router.POST("/user", handlers.RegisterUser)
+	router.POST("/user/login", handlers.LoginUser)
+	router.Run()
 }
