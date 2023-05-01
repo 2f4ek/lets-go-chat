@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-var minPasswordLength = 6
+var minPasswordLength = 8
 var minLoginLength = 4
 
 type CreateUserRequest struct {
@@ -17,7 +17,7 @@ type CreateUserRequest struct {
 
 type CreateUserResponse struct {
 	UserName string `json:"userName"`
-	Token    string `json:"token"`
+	Id       string `json:"id"`
 }
 
 func (r *CreateUserRequest) Validate() bool {
@@ -48,5 +48,5 @@ func RegisterUser(ctx *gin.Context) {
 
 	repositories.AppendUser(*user)
 
-	ctx.JSON(201, CreateUserResponse{UserName: user.Name, Token: user.Token})
+	ctx.JSON(201, CreateUserResponse{UserName: user.Name, Id: user.Id})
 }

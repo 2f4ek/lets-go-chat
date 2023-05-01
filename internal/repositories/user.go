@@ -4,6 +4,7 @@ import (
 	"github.com/2f4ek/lets-go-chat/internal/helpers"
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/pkg/hasher"
+	"os/exec"
 )
 
 var users = make(map[string]models.User)
@@ -17,6 +18,7 @@ func CreateUser(userName string, userPassword string) (*models.User, bool) {
 	passwordHash, _ := hasher.HashPassword(userPassword)
 
 	return &models.User{
+		Id:       exec.Command("uuidgen").String(),
 		Name:     userName,
 		Password: passwordHash,
 		Token:    helpers.GenerateSecureToken(),
