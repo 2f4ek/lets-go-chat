@@ -20,13 +20,13 @@ func (r *LoginRequest) validate() bool {
 }
 
 type LoginResponse struct {
-	Token string `json:"token"`
+	Url string `json:"url"`
 }
 
 func LoginUser(ctx *gin.Context) {
 	loginRequest := &LoginRequest{}
 	if err := ctx.Bind(loginRequest); err != nil {
-		ctx.String(http.StatusBadRequest, "Bad request")
+		ctx.String(http.StatusBadRequest, "Invalid username/password")
 		return
 	}
 
@@ -50,5 +50,7 @@ func LoginUser(ctx *gin.Context) {
 	ctx.Header("X-Expires-After", time.Now().Add(time.Hour*1).UTC().String())
 
 	user.Token = helpers.GenerateSecureToken()
-	ctx.JSON(http.StatusCreated, LoginResponse{Token: user.Token})
+
+	ctx.JSON(http.StatusCreated,
+		LoginResponse{Url: helpers.GetSchema(ctx) + ctx.Request.Host + "/ws&token=" + user.Token})
 }

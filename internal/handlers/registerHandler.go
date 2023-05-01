@@ -27,7 +27,7 @@ func (r *CreateUserRequest) Validate() bool {
 func RegisterUser(ctx *gin.Context) {
 	userRequest := &CreateUserRequest{}
 	if err := ctx.Bind(userRequest); err != nil {
-		ctx.String(http.StatusBadRequest, "Bad request")
+		ctx.String(http.StatusBadRequest, "Bad request, empty username or id")
 		return
 	}
 
