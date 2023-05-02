@@ -15,6 +15,10 @@ func AppendUser(user models.User) {
 
 func CreateUser(userName string, userPassword string) (*models.User, bool) {
 	_, userExists := users[userName]
+	if userExists {
+		return nil, userExists
+	}
+
 	passwordHash, _ := hasher.HashPassword(userPassword)
 
 	return &models.User{
