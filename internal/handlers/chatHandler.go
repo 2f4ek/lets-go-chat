@@ -37,7 +37,6 @@ func reader(conn *websocket.Conn, user *models.User) {
 		chat.RemoveUser(user.Token)
 		return
 	}
-	fmt.Println(string(p))
 
 	for _, chat := range chat.GetActiveUsers() {
 		if err := chat.Conn.WriteMessage(messageType, p); err != nil {
