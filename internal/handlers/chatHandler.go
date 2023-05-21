@@ -58,12 +58,16 @@ func WsInit(c *gin.Context) {
 		c.String(http.StatusBadRequest, fmt.Sprint("Token is invalid"))
 		return
 	}
-
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
+		log.Println("test here")
+		log.Println(err.Error())
+
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
+
 	chat := InitChat()
 	chat.AddUserToChat(*user, ws)
 	repositories.RevokeToken(user)
