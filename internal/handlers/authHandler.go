@@ -49,8 +49,9 @@ func LoginUser(ctx *gin.Context) {
 	ctx.Header("X-Rate-Limit", "999999")
 	ctx.Header("X-Expires-After", time.Now().Add(time.Hour*1).UTC().String())
 
-	user.Token = helpers.GenerateSecureToken()
+	token := helpers.GenerateSecureToken()
+	repositories.UpdateToken(user, token)
 
 	ctx.JSON(http.StatusCreated,
-		LoginResponse{Url: helpers.GetSchema(ctx) + ctx.Request.Host + "/ws&token=" + user.Token})
+		LoginResponse{Url: "wss://" + ctx.Request.Host + "/ws?token=" + token})
 }

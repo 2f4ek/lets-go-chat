@@ -98,7 +98,7 @@ components:
         url:
           type: string
           description: A url for websoket API with a one-time token for starting chat
-          example: ws://fancy-chat.io/ws&token=one-time-token
+          example: wss://fancy-chat.io/ws?token=one-time-token
     CreateUserRequest:
       required:
       - password

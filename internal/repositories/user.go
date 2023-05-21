@@ -33,3 +33,22 @@ func GetUser(userName string) (models.User, bool) {
 	user, userExists := users[userName]
 	return user, userExists
 }
+
+func GetUserByToken(token string) *models.User {
+	for _, user := range users {
+		if user.Token == token {
+			return &user
+		}
+	}
+
+	return nil
+}
+
+func UpdateToken(user models.User, token string) {
+	user.Token = token
+	users[user.Name] = user
+}
+
+func RevokeToken(user *models.User) {
+	user.Token = ""
+}

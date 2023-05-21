@@ -8,12 +8,21 @@ import (
 
 func main() {
 	app := gin.New()
-	logger := &middlewares.CustomLogger{}
-	app.Use(logger.Logger())
-	app.Use(logger.Recovery())
 
-	app.POST("/user", handlers.RegisterUser)
-	app.POST("/user/login", handlers.LoginUser)
+	initMiddlewares(app)
+	initRoutes(app)
 
 	app.Run()
+}
+
+func initMiddlewares(app *gin.Engine) {
+	app.Use(middlewares.Logger())
+	app.Use(middlewares.Recovery())
+}
+
+func initRoutes(app *gin.Engine) {
+	app.GET("/ws", handlers.WsInit)
+	app.POST("/user", handlers.RegisterUser)
+	app.POST("/user/login", handlers.LoginUser)
+	app.GET("/active-users", handlers.RegisterUser)
 }
