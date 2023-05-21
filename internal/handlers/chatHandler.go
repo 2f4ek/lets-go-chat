@@ -61,9 +61,6 @@ func WsInit(c *gin.Context) {
 	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
 	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Println("test here")
-		log.Println(err.Error())
-
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -80,8 +77,12 @@ func WsInit(c *gin.Context) {
 	}(ws)
 
 	for {
-		message := "client " + user.Id + " Connected!"
-		logger.Log(c, message, http.StatusInternalServerError)
 		reader(ws, user)
 	}
+}
+
+func ActiveUsers(c *gin.Context) {
+	chat := InitChat()
+	users := chat.ChatUsers
+	c.JSON(http.StatusOK, users)
 }

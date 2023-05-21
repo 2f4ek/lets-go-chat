@@ -50,5 +50,7 @@ func UpdateToken(user models.User, token string) {
 }
 
 func RevokeToken(user *models.User) {
-	user.Token = ""
+	actualUser := users[user.Name]
+	actualUser.Token = ""
+	users[user.Name] = actualUser
 }

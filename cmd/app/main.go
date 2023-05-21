@@ -24,4 +24,5 @@ func initRoutes(app *gin.Engine) {
 	app.GET("/ws", handlers.WsInit)
 	app.POST("/user", handlers.RegisterUser)
 	app.POST("/user/login", handlers.LoginUser)
+	app.GET("/active-users", handlers.ActiveUsers)
 }

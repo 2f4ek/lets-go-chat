@@ -5,6 +5,8 @@ import (
 )
 
 type ChatUser struct {
-	Conn  *websocket.Conn
-	Token string
+	Conn     *websocket.Conn
+	Token    string
+	UserId   string
+	UserName string
 }

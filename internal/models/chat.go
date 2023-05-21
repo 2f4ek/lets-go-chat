@@ -8,8 +8,10 @@ type Chat struct {
 
 func (chat *Chat) AddUserToChat(user User, conn *websocket.Conn) {
 	chat.ChatUsers[user.Token] = ChatUser{
-		Token: user.Token,
-		Conn:  conn,
+		Token:    user.Token,
+		Conn:     conn,
+		UserName: user.Name,
+		UserId:   user.Id,
 	}
 }
 
