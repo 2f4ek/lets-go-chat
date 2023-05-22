@@ -23,9 +23,7 @@ var (
 
 func InitChat() *models.Chat {
 	once.Do(func() {
-		chat = &models.Chat{
-			ChatUsers: make(map[string]models.ChatUser),
-		}
+		chat = &models.Chat{ChatUsers: make(map[string]models.ChatUser)}
 	})
 
 	return chat
