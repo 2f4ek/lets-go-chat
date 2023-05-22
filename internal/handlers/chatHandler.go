@@ -16,8 +16,10 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
-var chat *models.Chat
-var once sync.Once
+var (
+	chat *models.Chat
+	once sync.Once
+)
 
 func InitChat() *models.Chat {
 	once.Do(func() {
