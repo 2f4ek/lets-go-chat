@@ -12,13 +12,13 @@ import (
 	"sync"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
 var (
-	chat *models.Chat
-	once sync.Once
+	chat     *models.Chat
+	once     sync.Once
+	upgrader = websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
 )
 
 func InitChat() *models.Chat {
