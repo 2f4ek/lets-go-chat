@@ -38,8 +38,8 @@ func reader(conn *websocket.Conn, user *models.User) {
 		return
 	}
 
-	for _, chat := range chat.GetActiveUsers() {
-		if err := chat.Conn.WriteMessage(messageType, p); err != nil {
+	for _, chatUser := range chat.GetActiveUsers() {
+		if err := chatUser.Conn.WriteMessage(messageType, p); err != nil {
 			log.Println(err)
 			return
 		}
