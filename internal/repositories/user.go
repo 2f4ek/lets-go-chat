@@ -29,9 +29,9 @@ func CreateUser(userName string, userPassword string) (*models.User, bool) {
 	}, userExists
 }
 
-func GetUser(userName string) (models.User, bool) {
+func GetUser(userName string) (*models.User, bool) {
 	user, userExists := users[userName]
-	return user, userExists
+	return &user, userExists
 }
 
 func GetUserByToken(token string) *models.User {
@@ -44,13 +44,12 @@ func GetUserByToken(token string) *models.User {
 	return nil
 }
 
-func UpdateToken(user models.User, token string) {
+func UpdateToken(user *models.User, token string) {
 	user.Token = token
-	users[user.Name] = user
+	users[user.Name] = *user
 }
 
 func RevokeToken(user *models.User) {
-	actualUser := users[user.Name]
-	actualUser.Token = ""
-	users[user.Name] = actualUser
+	user.Token = ""
+	users[user.Name] = *user
 }

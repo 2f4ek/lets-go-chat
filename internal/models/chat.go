@@ -6,7 +6,7 @@ type Chat struct {
 	ChatUsers map[string]ChatUser
 }
 
-func (chat *Chat) AddUserToChat(user User, conn *websocket.Conn) {
+func (chat *Chat) AddUserToChat(user *User, conn *websocket.Conn) {
 	chat.ChatUsers[user.Token] = ChatUser{
 		Token:    user.Token,
 		Conn:     conn,
