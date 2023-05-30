@@ -52,6 +52,6 @@ func LoginUser(ctx *gin.Context) {
 	token := helpers.GenerateSecureToken()
 	repositories.UpdateToken(user, token)
 
-	ctx.JSON(http.StatusCreated,
+	ctx.JSON(http.StatusOK,
 		LoginResponse{Url: "wss://" + ctx.Request.Host + "/ws?token=" + token})
 }
