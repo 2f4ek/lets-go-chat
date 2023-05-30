@@ -57,7 +57,6 @@ func TestChat_GetActiveUsers(t *testing.T) {
 }
 
 func BenchmarkChat_CreateAndAddUserToChat(b *testing.B) {
-
 	rep := &models.Chat{
 		ChatUsers: map[string]models.ChatUser{},
 	}
