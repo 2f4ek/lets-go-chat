@@ -1,8 +1,13 @@
 package models
 
+import "time"
+
+type UserId int
+
 type User struct {
-	Id       string
-	Name     string
-	Password string
-	Token    string
+	Id           UserId
+	Name         string
+	Password     string
+	Token        string
+	LastActivity time.Time
 }

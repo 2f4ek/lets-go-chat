@@ -2,6 +2,7 @@ package models_test
 
 import (
 	"fmt"
+	"github.com/2f4ek/lets-go-chat/internal/chatModels"
 	"github.com/2f4ek/lets-go-chat/internal/handlers"
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	userRepo "github.com/2f4ek/lets-go-chat/internal/repositories"
@@ -16,11 +17,22 @@ func TestChat_AddUserToChat(t *testing.T) {
 	user, _ := userRepo.CreateUser("userName", "password1")
 
 	chat := handlers.InitChat()
-	chat.AddUserToChat(user, connections["user_token"])
+
+	chatUser := &chatModels.ChatUser{
+		Conn:          nil,
+		Chat:          chat,
+		MessageChanel: make(chan []byte),
+		User:          *user,
+	}
+
+	err := chat.AddUserToChat(&chatUser.User, connections["user_token"])
+	if err != nil {
+		return
+	}
 
 	assert.Len(t, chat.GetActiveUsers(), 1)
 
-	chat.RemoveUser(user.Token)
+	chat.RemoveUser(chatUser)
 }
 
 func TestChat_RemoveUser(t *testing.T) {
@@ -29,11 +41,20 @@ func TestChat_RemoveUser(t *testing.T) {
 	user, _ := userRepo.CreateUser("userName", "password1")
 
 	chat := handlers.InitChat()
-	chat.AddUserToChat(user, connections["user_token"])
+	chatUser := &chatModels.ChatUser{
+		Conn:          nil,
+		Chat:          chat,
+		MessageChanel: make(chan []byte),
+		User:          *user,
+	}
+	err := chat.AddUserToChat(&chatUser.User, connections["user_token"])
+	if err != nil {
+		return
+	}
 
 	assert.Len(t, chat.GetActiveUsers(), 1)
 
-	chat.RemoveUser(user.Token)
+	chat.RemoveUser(chatUser)
 
 	assert.Len(t, chat.GetActiveUsers(), 0)
 }
@@ -46,28 +67,49 @@ func TestChat_GetActiveUsers(t *testing.T) {
 	chat := handlers.InitChat()
 
 	user1, _ := userRepo.CreateUser("userName", "password1")
-	chat.AddUserToChat(user1, connections["user_token"])
+	chatUser1 := &chatModels.ChatUser{
+		Conn:          nil,
+		Chat:          chat,
+		MessageChanel: make(chan []byte),
+		User:          *user1,
+	}
+	err := chat.AddUserToChat(user1, connections["user_token"])
+	if err != nil {
+		return
+	}
 	user2, _ := userRepo.CreateUser("userName", "password1")
-	chat.AddUserToChat(user2, connections["user_token"])
+	chatUser2 := &chatModels.ChatUser{
+		Conn:          nil,
+		Chat:          chat,
+		MessageChanel: make(chan []byte),
+		User:          *user2,
+	}
+	err = chat.AddUserToChat(user2, connections["user_token"])
+	if err != nil {
+		return
+	}
 
 	assert.Len(t, chat.GetActiveUsers(), 2)
 
-	chat.RemoveUser(user1.Token)
-	chat.RemoveUser(user2.Token)
+	chat.RemoveUser(chatUser1)
+	chat.RemoveUser(chatUser2)
 }
 
 func BenchmarkChat_CreateAndAddUserToChat(b *testing.B) {
-	rep := &models.Chat{
-		ChatUsers: map[string]models.ChatUser{},
+	var rep = &chatModels.Chat{
+		ChatUsers: map[models.UserId]*chatModels.ChatUser{},
 	}
 	for i := 1; i < 10000; i++ {
 		user := models.User{
-			Id:       fmt.Sprint(i, "id"),
+			Id:       models.UserId(i),
 			Name:     fmt.Sprint(i, "name"),
 			Password: fmt.Sprint(i, "password"),
 			Token:    fmt.Sprint(i, "token"),
 		}
-		rep.AddUserToChat(&user, nil)
+		err := rep.AddUserToChat(&user, nil)
+		if err != nil {
+			return
+		}
 	}
 
 	for n := 0; n < b.N; n++ {

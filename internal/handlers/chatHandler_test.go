@@ -1,9 +1,9 @@
 package handlers_test
 
 import (
+	"github.com/2f4ek/lets-go-chat/internal/chatModels"
 	"github.com/2f4ek/lets-go-chat/internal/handlers"
 	"github.com/2f4ek/lets-go-chat/internal/helpers"
-	"github.com/2f4ek/lets-go-chat/internal/models"
 	userRepo "github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/2f4ek/lets-go-chat/internal/router"
 	"github.com/gin-gonic/gin"
@@ -17,7 +17,7 @@ func TestInitChat(t *testing.T) {
 	chat := handlers.InitChat()
 
 	assert.Same(t, chat, handlers.InitChat())
-	assert.IsType(t, &models.Chat{}, chat)
+	assert.IsType(t, &chatModels.Chat{}, chat)
 }
 
 func TestActiveUsers(t *testing.T) {

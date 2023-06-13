@@ -2,18 +2,17 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/2f4ek/lets-go-chat/internal/chatModels"
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
-	"github.com/2f4ek/lets-go-chat/pkg/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"log"
 	"net/http"
 	"sync"
 )
 
 var (
-	chat     *models.Chat
+	chat     *chatModels.Chat
 	once     sync.Once
 	upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -21,29 +20,16 @@ var (
 	}
 )
 
-func InitChat() *models.Chat {
+func InitChat() *chatModels.Chat {
 	once.Do(func() {
-		chat = &models.Chat{ChatUsers: make(map[string]models.ChatUser)}
+		chat = &chatModels.Chat{
+			MessageBroadcast: make(chan []byte),
+			Leavers:          make(chan chatModels.ChatUser),
+			ChatUsers:        make(map[models.UserId]*chatModels.ChatUser),
+		}
 	})
 
 	return chat
-}
-
-func reader(conn *websocket.Conn, user *models.User) {
-	messageType, p, err := conn.ReadMessage()
-	chat := InitChat()
-	if err != nil {
-		log.Println(err)
-		chat.RemoveUser(user.Token)
-		return
-	}
-
-	for _, chatUser := range chat.GetActiveUsers() {
-		if err := chatUser.Conn.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
-		}
-	}
 }
 
 func WsInit(c *gin.Context) {
@@ -65,24 +51,21 @@ func WsInit(c *gin.Context) {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
-	chat := InitChat()
-	chat.AddUserToChat(user, ws)
-	repositories.RevokeToken(user)
 
-	defer func(ws *websocket.Conn) {
-		err := ws.Close()
-		if err != nil {
-			logger.Log(c, "WebSocket error", http.StatusInternalServerError)
-		}
-	}(ws)
-
-	for {
-		reader(ws, user)
+	err = chat.AddUserToChat(user, ws)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
 	}
+
+	repositories.RevokeToken(user)
 }
 
 func ActiveUsers(c *gin.Context) {
-	chat := InitChat()
-	users := chat.ChatUsers
-	c.JSON(http.StatusOK, users)
+	result := make([]models.UserId, 0)
+	for _, user := range chat.GetActiveUsers() {
+		result = append(result, user.GetUserId())
+	}
+
+	c.JSON(http.StatusOK, result)
 }

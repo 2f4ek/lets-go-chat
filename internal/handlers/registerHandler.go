@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -16,8 +17,8 @@ type CreateUserRequest struct {
 }
 
 type CreateUserResponse struct {
-	UserName string `json:"userName"`
-	Id       string `json:"id"`
+	UserName string        `json:"userName"`
+	Id       models.UserId `json:"id"`
 }
 
 func (r *CreateUserRequest) Validate() bool {
