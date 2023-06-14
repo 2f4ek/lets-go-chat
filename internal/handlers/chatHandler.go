@@ -24,7 +24,8 @@ func InitChat() *chatModels.Chat {
 	once.Do(func() {
 		chat = &chatModels.Chat{
 			MessageBroadcast: make(chan []byte),
-			Leavers:          make(chan chatModels.ChatUser),
+			Logout:           make(chan chatModels.ChatUser),
+			Login:            make(chan chatModels.LoginUser),
 			ChatUsers:        make(map[models.UserId]*chatModels.ChatUser),
 		}
 	})
@@ -52,7 +53,7 @@ func WsInit(c *gin.Context) {
 		return
 	}
 
-	err = chat.AddUserToChat(user, ws)
+	err = chat.LoginUserToChat(user, ws)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

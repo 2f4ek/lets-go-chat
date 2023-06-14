@@ -8,17 +8,25 @@ import (
 
 type Chat struct {
 	ChatUsers        map[models.UserId]*ChatUser
-	Leavers          chan ChatUser
+	Logout           chan ChatUser
+	Login            chan LoginUser
 	MessageBroadcast chan []byte
+}
+
+type LoginUser struct {
+	User *models.User
+	Conn *websocket.Conn
 }
 
 func (c *Chat) RunChat() {
 	for {
 		select {
-		case user := <-c.Leavers:
+		case user := <-c.Logout:
 			if _, ok := c.ChatUsers[user.GetUserId()]; ok {
 				c.RemoveUser(&user)
 			}
+		case user := <-c.Login:
+			c.AddUserToChat(&user)
 		case message := <-c.MessageBroadcast:
 			for _, user := range c.ChatUsers {
 				select {
@@ -31,46 +39,55 @@ func (c *Chat) RunChat() {
 	}
 }
 
-func (c *Chat) AddUserToChat(user *models.User, conn *websocket.Conn) error {
+func (c *Chat) AddUserToChat(loginUser *LoginUser) {
 	u := &ChatUser{
-		Conn:          conn,
+		Conn:          loginUser.Conn,
 		Chat:          c,
 		MessageChanel: make(chan []byte),
-		User:          *user,
+		User:          *loginUser.User,
 	}
 	if activeUser, ok := c.ChatUsers[u.GetUserId()]; ok {
+		err := activeUser.Conn.Close()
+		if err != nil {
+			return
+		}
+	}
+
+	c.ChatUsers[u.GetUserId()] = u
+	go u.SyncMissedMessages()
+	go u.ReadMessage()
+	go u.WriteMessage()
+}
+
+func (c *Chat) LoginUserToChat(user *models.User, conn *websocket.Conn) error {
+	if activeUser, ok := c.ChatUsers[user.Id]; ok {
 		err := activeUser.Conn.Close()
 		if err != nil {
 			return err
 		}
 	}
-	c.ChatUsers[user.Id] = u
 
-	err := SyncMissedMessages(u)
-	if err != nil {
-		return err
-	}
-
-	go u.ReadMessage()
-	go u.WriteMessage()
+	loginUser := LoginUser{User: user, Conn: conn}
+	c.Login <- loginUser
 
 	return nil
 }
 
-func SyncMissedMessages(user *ChatUser) error {
-	messages, err := models.GetMissedMessages(&user.User)
+func (cu ChatUser) SyncMissedMessages() {
+	messages, err := models.GetMissedMessages(&cu.User)
 	if err != nil {
-		return err
+		return
 	}
 
 	for _, message := range messages {
-		err := user.Conn.WriteMessage(websocket.TextMessage, []byte(message.Message))
+		err := cu.Conn.WriteMessage(websocket.TextMessage, []byte(message.Message))
 
 		if err != nil {
-			return err
+			return
 		}
 	}
-	return nil
+
+	return
 }
 
 func (c *Chat) RemoveUser(user *ChatUser) {
@@ -86,7 +103,7 @@ func (c *Chat) GetActiveUsers() map[models.UserId]*ChatUser {
 
 func (cu ChatUser) ReadMessage() {
 	defer func() {
-		cu.Chat.Leavers <- cu
+		cu.Chat.Logout <- cu
 		err := cu.Conn.Close()
 		if err != nil {
 			return
