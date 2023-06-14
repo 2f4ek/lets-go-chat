@@ -46,14 +46,8 @@ func (c *Chat) AddUserToChat(loginUser *LoginUser) {
 		MessageChanel: make(chan []byte),
 		User:          *loginUser.User,
 	}
-	if activeUser, ok := c.ChatUsers[u.GetUserId()]; ok {
-		err := activeUser.Conn.Close()
-		if err != nil {
-			return
-		}
-	}
-
 	c.ChatUsers[u.GetUserId()] = u
+
 	go u.SyncMissedMessages()
 	go u.ReadMessage()
 	go u.WriteMessage()
