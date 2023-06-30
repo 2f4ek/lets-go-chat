@@ -27,12 +27,3 @@ func InitializeRouter() (router.Router, error) {
 	routerRouter := router.ProvideRouter(chatHandler, registerHandler, authHandler)
 	return routerRouter, nil
 }
-
-func InitializeChat() (*handlers.ChatHandler, error) {
-	userRepository := repositories.ProvideUserRepository()
-	databaseDatabase := database.ProvideDatabase()
-	chatMessageRepository := repositories.ProvideChatMessageRepository(databaseDatabase)
-	chat := chatModels.ProvideChat(userRepository, chatMessageRepository)
-	chatHandler := handlers.ProvideChatHandler(userRepository, chat)
-	return chatHandler, nil
-}

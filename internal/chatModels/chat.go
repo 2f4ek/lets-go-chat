@@ -1,16 +1,9 @@
 package chatModels
 
 import (
-	"sync"
-
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/gorilla/websocket"
-)
-
-var (
-	ChatInstanse *Chat
-	once         *sync.Once
 )
 
 type Chat struct {
@@ -28,18 +21,14 @@ type LoginUser struct {
 }
 
 func ProvideChat(ur *repositories.UserRepository, cmr *repositories.ChatMessageRepository) *Chat {
-	once.Do(func() {
-		ChatInstanse = &Chat{
-			MessageBroadcast: make(chan []byte),
-			Logout:           make(chan ChatUser),
-			Login:            make(chan LoginUser),
-			ChatUsers:        make(map[models.UserId]*ChatUser),
-			UserRepository:   ur,
-			ChatMessageRep:   cmr,
-		}
-	})
-
-	return ChatInstanse
+	return &Chat{
+		MessageBroadcast: make(chan []byte),
+		Logout:           make(chan ChatUser),
+		Login:            make(chan LoginUser),
+		ChatUsers:        make(map[models.UserId]*ChatUser),
+		UserRepository:   ur,
+		ChatMessageRep:   cmr,
+	}
 }
 
 func (c *Chat) RunChat() {

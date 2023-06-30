@@ -14,12 +14,6 @@ func main() {
 	loadEnv()
 	runMigrations(database.Database{})
 
-	chat, err := InitializeChat()
-	if err != nil {
-		log.Fatal(err)
-	}
-	go chat.InitChat().RunChat()
-
 	routes, err := InitializeRouter()
 	if err != nil {
 		log.Fatal(err)
