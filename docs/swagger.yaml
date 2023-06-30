@@ -1,0 +1,119 @@
+basePath: /
+definitions:
+  handlers.CreateUserRequest:
+    description: Create user request
+    properties:
+      password:
+        description: Password of existing user
+        type: string
+      userName:
+        description: UserName of existing user
+        type: string
+    type: object
+  handlers.CreateUserResponse:
+    description: Response with registered user data
+    properties:
+      id:
+        description: ID of new user
+        type: integer
+      userName:
+        description: UserName name of new user
+        type: string
+    type: object
+  handlers.LoginRequest:
+    description: Login request
+    properties:
+      password:
+        description: Password should be more than 4 chars
+        type: string
+      userName:
+        description: UserName should be available in the system
+        type: string
+    type: object
+  handlers.LoginResponse:
+    description: Login response with websocket url
+    properties:
+      url:
+        description: Url contains path to connect to websocket
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Chat.
+  termsOfService: http://swagger.io/terms/
+  title: 2f4ek Lets Go Chat openAPI documentation
+  version: "1.0"
+paths:
+  /active-users:
+    get:
+      description: Get all active users
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: integer
+            type: array
+        "400":
+          description: Error message
+          schema:
+            type: string
+      summary: Active users
+  /user:
+    post:
+      description: Register user by userName and password
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateUserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.CreateUserResponse'
+        "400":
+          description: Error message
+          schema:
+            type: string
+      summary: Registration
+  /user/login:
+    post:
+      description: Login user by userName and password
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.LoginResponse'
+        "400":
+          description: Error message
+          schema:
+            type: string
+      summary: Login
+  /ws:
+    get:
+      description: Open websocket connection for user by token
+      parameters:
+      - description: User Token
+        in: path
+        name: token
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Initialize chat
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

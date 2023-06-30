@@ -10,6 +10,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title           2f4ek Lets Go Chat openAPI documentation
+// @version         1.0
+// @description     Chat.
+// @termsOfService  http://swagger.io/terms/
+
+// @host      localhost:8080
+// @BasePath  /
+
+// @securityDefinitions.basic  BasicAuth
 func main() {
 	loadEnv()
 	runMigrations(database.Database{})

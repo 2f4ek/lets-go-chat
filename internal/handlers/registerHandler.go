@@ -11,7 +11,7 @@ import (
 
 var minPasswordLength = 8
 var minLoginLength = 4
-var RHInstanse *RegisterHandler
+var RHInstance *RegisterHandler
 
 type ICreateUserRequest interface {
 	Validate() bool
@@ -21,14 +21,22 @@ type ICreateUserResponse interface {
 	RegisterUser(ctx *gin.Context)
 }
 
+// CreateUserRequest
+// @Description Create user request
 type CreateUserRequest struct {
+	// UserName of existing user
 	UserName string `json:"userName"`
+	// Password of existing user
 	Password string `json:"password"`
 }
 
+// CreateUserResponse
+// @Description Response with registered user data
 type CreateUserResponse struct {
-	UserName string        `json:"userName"`
-	Id       models.UserId `json:"id"`
+	// UserName name of new user
+	UserName string `json:"userName"`
+	// ID of new user
+	ID models.UserId `json:"id"`
 }
 
 type RegisterHandler struct {
@@ -37,19 +45,27 @@ type RegisterHandler struct {
 
 func ProvideRegisterHandler(ur *repositories.UserRepository) *RegisterHandler {
 	once.Do(func() {
-		RHInstanse = &RegisterHandler{ur: ur}
+		RHInstance = &RegisterHandler{ur: ur}
 	})
-	return RHInstanse
+	return RHInstance
 }
 
 func (r *CreateUserRequest) Validate() bool {
 	return len(r.UserName) > minLoginLength && len(r.Password) > minPasswordLength
 }
 
+// RegisterUser godoc
+// @Summary Registration
+// @Description Register user by userName and password
+// @Schemes http https
+// @Param request body handlers.CreateUserRequest true "query params"
+// @failure 400 {string} string "Error message"
+// @Success 200 {object} handlers.CreateUserResponse
+// @Router /user [POST]
 func (r *RegisterHandler) RegisterUser(ctx *gin.Context) {
 	userRequest := &CreateUserRequest{}
 	if err := ctx.Bind(userRequest); err != nil {
-		ctx.String(http.StatusBadRequest, "Bad request, empty username or id")
+		ctx.String(http.StatusBadRequest, "Bad request, empty username or password")
 		return
 	}
 
@@ -57,18 +73,18 @@ func (r *RegisterHandler) RegisterUser(ctx *gin.Context) {
 	if !ok {
 		ctx.String(http.StatusBadRequest,
 			fmt.Sprintf(
-				"user name should contain more than %s chars and password should contain more than %s chars",
+				"username should contain more than %s chars and password should contain more than %s chars",
 				string(rune(minLoginLength)), string(rune(minPasswordLength))))
 		return
 	}
 
 	user, userExists := r.ur.CreateUser(userRequest.UserName, userRequest.Password)
 	if userExists == true {
-		ctx.String(http.StatusBadRequest, "User name already taken")
+		ctx.String(http.StatusBadRequest, "Username already taken")
 		return
 	}
 
 	r.ur.AppendUser(*user)
 
-	ctx.JSON(201, CreateUserResponse{UserName: user.Name, Id: user.Id})
+	ctx.JSON(201, CreateUserResponse{UserName: user.Name, ID: user.Id})
 }

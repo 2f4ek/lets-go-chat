@@ -43,6 +43,13 @@ func (ch *ChatHandler) InitChat() *chatModels.Chat {
 	return ch.chat
 }
 
+// WsInit godoc
+// @Summary Initialize chat
+// @Description Open websocket connection for user by token
+// @schemes ws wss
+// @Param token path string true "User Token"
+// @Success 200
+// @Router /ws [get]
 func (ch *ChatHandler) WsInit(c *gin.Context) {
 	token := c.Query("token")
 	if token == "" {
@@ -72,6 +79,13 @@ func (ch *ChatHandler) WsInit(c *gin.Context) {
 	ch.ur.RevokeToken(user)
 }
 
+// ActiveUsers godoc
+// @Summary Active users
+// @Description Get all active users
+// @Schemes http https
+// @failure 400 {string} string "Error message"
+// @Success 200 {array} models.UserId
+// @Router /active-users [GET]
 func (ch *ChatHandler) ActiveUsers(c *gin.Context) {
 	result := make([]models.UserId, 0)
 	for _, user := range ch.chat.GetActiveUsers() {

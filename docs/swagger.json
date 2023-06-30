@@ -1,0 +1,178 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Chat.",
+        "title": "2f4ek Lets Go Chat openAPI documentation",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/active-users": {
+            "get": {
+                "description": "Get all active users",
+                "summary": "Active users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "post": {
+                "description": "Register user by userName and password",
+                "summary": "Registration",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "description": "Login user by userName and password",
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "query params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Error message",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/ws": {
+            "get": {
+                "description": "Open websocket connection for user by token",
+                "summary": "Initialize chat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.CreateUserRequest": {
+            "description": "Create user request",
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "Password of existing user",
+                    "type": "string"
+                },
+                "userName": {
+                    "description": "UserName of existing user",
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.CreateUserResponse": {
+            "description": "Response with registered user data",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "ID of new user",
+                    "type": "integer"
+                },
+                "userName": {
+                    "description": "UserName name of new user",
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.LoginRequest": {
+            "description": "Login request",
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "Password should be more than 4 chars",
+                    "type": "string"
+                },
+                "userName": {
+                    "description": "UserName should be available in the system",
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.LoginResponse": {
+            "description": "Login response with websocket url",
+            "type": "object",
+            "properties": {
+                "url": {
+                    "description": "Url contains path to connect to websocket",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    }
+}

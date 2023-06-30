@@ -25,12 +25,19 @@ type ILoginRequest interface {
 	validate() bool
 }
 
+// LoginRequest
+// @Description Login request
 type LoginRequest struct {
+	// UserName should be available in the system
 	UserName string `json:"userName"`
+	// Password should be more than 4 chars
 	Password string `json:"password"`
 }
 
+// LoginResponse
+// @Description Login response with websocket url
 type LoginResponse struct {
+	// Url contains path to connect to websocket
 	Url string `json:"url"`
 }
 
@@ -45,6 +52,14 @@ func (r *LoginRequest) validate() bool {
 	return len(r.UserName) > 0 && len(r.Password) > 0
 }
 
+// LoginUser godoc
+// @Summary Login
+// @Description Login user by userName and password
+// @Schemes http https
+// @Param request body handlers.LoginRequest true "query params"
+// @failure 400 {string} string "Error message"
+// @Success 200 {object} handlers.LoginResponse
+// @Router /user/login [POST]
 func (ah *AuthHandler) LoginUser(ctx *gin.Context) {
 	loginRequest := &LoginRequest{}
 	if err := ctx.Bind(loginRequest); err != nil {
