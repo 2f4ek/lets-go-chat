@@ -10,9 +10,19 @@ import (
 )
 
 var (
-	URInstanse *UserRepository
+	URInstance *UserRepository
 	once       sync.Once
 )
+
+type IUserRepository interface {
+	AppendUser(user models.User)
+	CreateUser(userName string, userPassword string) (*models.User, bool)
+	GetUser(userName string) (*models.User, bool)
+	GetUserByToken(token string) *models.User
+	UpdateToken(user *models.User, token string)
+	RevokeToken(user *models.User)
+	UpdateUserLastActivity(user *models.User)
+}
 
 type UserRepository struct {
 	users map[models.UserId]models.User
@@ -20,10 +30,10 @@ type UserRepository struct {
 
 func ProvideUserRepository() *UserRepository {
 	once.Do(func() {
-		URInstanse = &UserRepository{}
-		URInstanse.users = make(map[models.UserId]models.User)
+		URInstance = &UserRepository{}
+		URInstance.users = make(map[models.UserId]models.User)
 	})
-	return URInstanse
+	return URInstance
 }
 
 func (rep *UserRepository) AppendUser(user models.User) {

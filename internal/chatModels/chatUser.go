@@ -5,6 +5,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type IChatUser interface {
+	GetUserId() models.UserId
+	ReadMessage()
+	WriteMessage()
+	SyncMissedMessages()
+}
+
 type ChatUser struct {
 	Conn          *websocket.Conn
 	Chat          *Chat

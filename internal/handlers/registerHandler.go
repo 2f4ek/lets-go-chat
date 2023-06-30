@@ -13,6 +13,14 @@ var minPasswordLength = 8
 var minLoginLength = 4
 var RHInstanse *RegisterHandler
 
+type ICreateUserRequest interface {
+	Validate() bool
+}
+
+type ICreateUserResponse interface {
+	RegisterUser(ctx *gin.Context)
+}
+
 type CreateUserRequest struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`

@@ -6,6 +6,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type IChat interface {
+	RunChat()
+	AddUserToChat(loginUser *LoginUser)
+	LoginUserToChat(user *models.User, conn *websocket.Conn) error
+	RemoveUser(user *ChatUser)
+	GetActiveUsers() map[models.UserId]*ChatUser
+}
+
 type Chat struct {
 	ChatUsers        map[models.UserId]*ChatUser
 	Logout           chan ChatUser

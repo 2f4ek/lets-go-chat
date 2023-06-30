@@ -7,7 +7,12 @@ import (
 	"github.com/2f4ek/lets-go-chat/internal/models"
 )
 
-var CMRInstanse *ChatMessageRepository
+var CMRInstance *ChatMessageRepository
+
+type IChatMessageRepository interface {
+	Save(m models.Message) (*models.Message, error)
+	GetMissedMessages(user *models.User) ([]*models.Message, error)
+}
 
 type ChatMessageRepository struct {
 	db database.Database
@@ -15,10 +20,10 @@ type ChatMessageRepository struct {
 
 func ProvideChatMessageRepository(db *database.Database) *ChatMessageRepository {
 	once.Do(func() {
-		CMRInstanse = &ChatMessageRepository{}
-		CMRInstanse.db = *db
+		CMRInstance = &ChatMessageRepository{}
+		CMRInstance.db = *db
 	})
-	return CMRInstanse
+	return CMRInstance
 }
 
 func (cm *ChatMessageRepository) Save(m models.Message) (*models.Message, error) {

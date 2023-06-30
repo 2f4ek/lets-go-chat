@@ -11,10 +11,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AHIstanse *AuthHandler
+var AHInstance *AuthHandler
+
+type IAuthHandler interface {
+	LoginUser(ctx *gin.Context)
+}
 
 type AuthHandler struct {
 	ur *repositories.UserRepository
+}
+
+type ILoginRequest interface {
+	validate() bool
 }
 
 type LoginRequest struct {
@@ -22,19 +30,19 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
+type LoginResponse struct {
+	Url string `json:"url"`
+}
+
 func ProvideAuthHandler(ur *repositories.UserRepository) *AuthHandler {
 	once.Do(func() {
-		AHIstanse = &AuthHandler{ur: ur}
+		AHInstance = &AuthHandler{ur: ur}
 	})
-	return AHIstanse
+	return AHInstance
 }
 
 func (r *LoginRequest) validate() bool {
 	return len(r.UserName) > 0 && len(r.Password) > 0
-}
-
-type LoginResponse struct {
-	Url string `json:"url"`
 }
 
 func (ah *AuthHandler) LoginUser(ctx *gin.Context) {

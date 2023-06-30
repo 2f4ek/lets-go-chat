@@ -12,13 +12,19 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type IChatHandler interface {
+	InitChat() *chatModels.Chat
+	WsInit(c *gin.Context)
+	ActiveUsers(c *gin.Context)
+}
+
 type ChatHandler struct {
 	ur   *repositories.UserRepository
 	chat *chatModels.Chat
 }
 
 var (
-	CInstanse *ChatHandler
+	CInstance *ChatHandler
 	once      sync.Once
 	upgrader  = websocket.Upgrader{
 		ReadBufferSize:  1024,
@@ -28,9 +34,9 @@ var (
 
 func ProvideChatHandler(ur *repositories.UserRepository, chat *chatModels.Chat) *ChatHandler {
 	once.Do(func() {
-		CInstanse = &ChatHandler{ur: ur, chat: chat}
+		CInstance = &ChatHandler{ur: ur, chat: chat}
 	})
-	return CInstanse
+	return CInstance
 }
 
 func (ch *ChatHandler) InitChat() *chatModels.Chat {
