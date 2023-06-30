@@ -1,20 +1,37 @@
 package repositories
 
 import (
+	"sync"
+	"time"
+
 	"github.com/2f4ek/lets-go-chat/internal/helpers"
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/pkg/hasher"
-	"time"
 )
 
-var users = make(map[models.UserId]models.User)
+var (
+	URInstanse *UserRepository
+	once       sync.Once
+)
 
-func AppendUser(user models.User) {
-	users[user.Id] = user
+type UserRepository struct {
+	users map[models.UserId]models.User
 }
 
-func CreateUser(userName string, userPassword string) (*models.User, bool) {
-	for _, user := range users {
+func ProvideUserRepository() *UserRepository {
+	once.Do(func() {
+		URInstanse = &UserRepository{}
+		URInstanse.users = make(map[models.UserId]models.User)
+	})
+	return URInstanse
+}
+
+func (rep *UserRepository) AppendUser(user models.User) {
+	rep.users[user.Id] = user
+}
+
+func (rep *UserRepository) CreateUser(userName string, userPassword string) (*models.User, bool) {
+	for _, user := range rep.users {
 		if user.Name == userName {
 			return nil, true
 		}
@@ -22,7 +39,7 @@ func CreateUser(userName string, userPassword string) (*models.User, bool) {
 
 	passwordHash, _ := hasher.HashPassword(userPassword)
 
-	userId := len(users)
+	userId := len(rep.users)
 	userId++
 
 	return &models.User{
@@ -33,8 +50,8 @@ func CreateUser(userName string, userPassword string) (*models.User, bool) {
 	}, false
 }
 
-func GetUser(userName string) (*models.User, bool) {
-	for _, user := range users {
+func (rep *UserRepository) GetUser(userName string) (*models.User, bool) {
+	for _, user := range rep.users {
 		if user.Name == userName {
 			return &user, true
 		}
@@ -43,8 +60,8 @@ func GetUser(userName string) (*models.User, bool) {
 	return nil, false
 }
 
-func GetUserByToken(token string) *models.User {
-	for _, user := range users {
+func (rep *UserRepository) GetUserByToken(token string) *models.User {
+	for _, user := range rep.users {
 		if user.Token == token {
 			return &user
 		}
@@ -53,17 +70,17 @@ func GetUserByToken(token string) *models.User {
 	return nil
 }
 
-func UpdateToken(user *models.User, token string) {
+func (rep *UserRepository) UpdateToken(user *models.User, token string) {
 	user.Token = token
-	users[user.Id] = *user
+	rep.users[user.Id] = *user
 }
 
-func RevokeToken(user *models.User) {
+func (rep *UserRepository) RevokeToken(user *models.User) {
 	user.Token = ""
-	users[user.Id] = *user
+	rep.users[user.Id] = *user
 }
 
-func UpdateUserLastActivity(user *models.User) {
+func (rep *UserRepository) UpdateUserLastActivity(user *models.User) {
 	user.LastActivity = time.Now()
-	users[user.Id] = *user
+	rep.users[user.Id] = *user
 }

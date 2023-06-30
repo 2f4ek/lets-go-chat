@@ -2,45 +2,49 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+	"sync"
+
 	"github.com/2f4ek/lets-go-chat/internal/chatModels"
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"net/http"
-	"sync"
 )
 
+type ChatHandler struct {
+	ur   *repositories.UserRepository
+	chat *chatModels.Chat
+}
+
 var (
-	chat     *chatModels.Chat
-	once     sync.Once
-	upgrader = websocket.Upgrader{
+	CInstanse *ChatHandler
+	once      sync.Once
+	upgrader  = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
 )
 
-func InitChat() *chatModels.Chat {
+func ProvideChatHandler(ur *repositories.UserRepository, chat *chatModels.Chat) *ChatHandler {
 	once.Do(func() {
-		chat = &chatModels.Chat{
-			MessageBroadcast: make(chan []byte),
-			Logout:           make(chan chatModels.ChatUser),
-			Login:            make(chan chatModels.LoginUser),
-			ChatUsers:        make(map[models.UserId]*chatModels.ChatUser),
-		}
+		CInstanse = &ChatHandler{ur: ur, chat: chat}
 	})
-
-	return chat
+	return CInstanse
 }
 
-func WsInit(c *gin.Context) {
+func (ch *ChatHandler) InitChat() *chatModels.Chat {
+	return ch.chat
+}
+
+func (ch *ChatHandler) WsInit(c *gin.Context) {
 	token := c.Query("token")
 	if token == "" {
 		c.String(http.StatusBadRequest, fmt.Sprint("Token is required"))
 		return
 	}
 
-	user := repositories.GetUserByToken(token)
+	user := ch.ur.GetUserByToken(token)
 	if user == nil {
 		c.String(http.StatusBadRequest, fmt.Sprint("Token is invalid"))
 		return
@@ -53,18 +57,18 @@ func WsInit(c *gin.Context) {
 		return
 	}
 
-	err = chat.LoginUserToChat(user, ws)
+	err = ch.chat.LoginUserToChat(user, ws)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	repositories.RevokeToken(user)
+	ch.ur.RevokeToken(user)
 }
 
-func ActiveUsers(c *gin.Context) {
+func (ch *ChatHandler) ActiveUsers(c *gin.Context) {
 	result := make([]models.UserId, 0)
-	for _, user := range chat.GetActiveUsers() {
+	for _, user := range ch.chat.GetActiveUsers() {
 		result = append(result, user.GetUserId())
 	}
 

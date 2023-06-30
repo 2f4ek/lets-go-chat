@@ -1,9 +1,16 @@
 package chatModels
 
 import (
+	"sync"
+
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/gorilla/websocket"
+)
+
+var (
+	ChatInstanse *Chat
+	once         *sync.Once
 )
 
 type Chat struct {
@@ -11,11 +18,28 @@ type Chat struct {
 	Logout           chan ChatUser
 	Login            chan LoginUser
 	MessageBroadcast chan []byte
+	UserRepository   *repositories.UserRepository
+	ChatMessageRep   *repositories.ChatMessageRepository
 }
 
 type LoginUser struct {
 	User *models.User
 	Conn *websocket.Conn
+}
+
+func ProvideChat(ur *repositories.UserRepository, cmr *repositories.ChatMessageRepository) *Chat {
+	once.Do(func() {
+		ChatInstanse = &Chat{
+			MessageBroadcast: make(chan []byte),
+			Logout:           make(chan ChatUser),
+			Login:            make(chan LoginUser),
+			ChatUsers:        make(map[models.UserId]*ChatUser),
+			UserRepository:   ur,
+			ChatMessageRep:   cmr,
+		}
+	})
+
+	return ChatInstanse
 }
 
 func (c *Chat) RunChat() {
@@ -67,67 +91,13 @@ func (c *Chat) LoginUserToChat(user *models.User, conn *websocket.Conn) error {
 	return nil
 }
 
-func (cu ChatUser) SyncMissedMessages() {
-	messages, err := models.GetMissedMessages(&cu.User)
-	if err != nil {
-		return
-	}
-
-	for _, message := range messages {
-		err := cu.Conn.WriteMessage(websocket.TextMessage, []byte(message.Message))
-
-		if err != nil {
-			return
-		}
-	}
-
-	return
-}
-
 func (c *Chat) RemoveUser(user *ChatUser) {
 	close(user.MessageChanel)
 	delete(c.ChatUsers, user.GetUserId())
 
-	repositories.UpdateUserLastActivity(&user.User)
+	c.UserRepository.UpdateUserLastActivity(&user.User)
 }
 
 func (c *Chat) GetActiveUsers() map[models.UserId]*ChatUser {
 	return c.ChatUsers
-}
-
-func (cu ChatUser) ReadMessage() {
-	defer func() {
-		cu.Chat.Logout <- cu
-		err := cu.Conn.Close()
-		if err != nil {
-			return
-		}
-	}()
-
-	for {
-		_, p, err := cu.Conn.ReadMessage()
-		if err != nil {
-			break
-		}
-
-		message := &models.Message{Message: string(p)}
-		_, err = message.Save()
-		if err != nil {
-			break
-		}
-
-		cu.Chat.MessageBroadcast <- p
-	}
-}
-
-func (cu ChatUser) WriteMessage() {
-	for {
-		select {
-		case message := <-cu.MessageChanel:
-			err := cu.Conn.WriteMessage(websocket.TextMessage, message)
-			if err != nil {
-				return
-			}
-		}
-	}
 }

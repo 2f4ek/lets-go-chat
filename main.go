@@ -1,27 +1,33 @@
 package main
 
 import (
+	"log"
+
 	"github.com/2f4ek/lets-go-chat/database"
-	"github.com/2f4ek/lets-go-chat/internal/handlers"
 	"github.com/2f4ek/lets-go-chat/internal/models"
-	"github.com/2f4ek/lets-go-chat/internal/router"
 	"github.com/2f4ek/lets-go-chat/pkg/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"log"
 )
 
 func main() {
 	loadEnv()
-	loadDatabase()
+	runMigrations(database.Database{})
+
+	chat, err := InitializeChat()
+	if err != nil {
+		log.Fatal(err)
+	}
+	go chat.InitChat().RunChat()
+
+	routes, err := InitializeRouter()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	app := gin.New()
-
 	initMiddlewares(app)
-	chat := handlers.InitChat()
-	go chat.RunChat()
-	router.InitRoutes(app)
-
+	routes.InitRoutes(app)
 	app.Run()
 }
 
@@ -30,9 +36,9 @@ func initMiddlewares(app *gin.Engine) {
 	app.Use(middlewares.Recovery())
 }
 
-func loadDatabase() {
-	database.Connect()
-	err := database.Database.AutoMigrate(&models.Message{})
+func runMigrations(db database.Database) {
+	db.Connect()
+	err := db.Database.AutoMigrate(&models.Message{})
 	if err != nil {
 		return
 	}

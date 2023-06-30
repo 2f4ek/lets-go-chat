@@ -2,17 +2,31 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/2f4ek/lets-go-chat/internal/helpers"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/2f4ek/lets-go-chat/pkg/hasher"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
+
+var AHIstanse *AuthHandler
+
+type AuthHandler struct {
+	ur *repositories.UserRepository
+}
 
 type LoginRequest struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`
+}
+
+func ProvideAuthHandler(ur *repositories.UserRepository) *AuthHandler {
+	once.Do(func() {
+		AHIstanse = &AuthHandler{ur: ur}
+	})
+	return AHIstanse
 }
 
 func (r *LoginRequest) validate() bool {
@@ -23,7 +37,7 @@ type LoginResponse struct {
 	Url string `json:"url"`
 }
 
-func LoginUser(ctx *gin.Context) {
+func (ah *AuthHandler) LoginUser(ctx *gin.Context) {
 	loginRequest := &LoginRequest{}
 	if err := ctx.Bind(loginRequest); err != nil {
 		ctx.String(http.StatusBadRequest, "Invalid username/password")
@@ -35,7 +49,7 @@ func LoginUser(ctx *gin.Context) {
 		return
 	}
 
-	user, userExists := repositories.GetUser(loginRequest.UserName)
+	user, userExists := ah.ur.GetUser(loginRequest.UserName)
 	if !userExists {
 		ctx.String(http.StatusBadRequest, fmt.Sprint("User not founded"))
 		return
@@ -50,7 +64,7 @@ func LoginUser(ctx *gin.Context) {
 	ctx.Header("X-Expires-After", time.Now().Add(time.Hour*1).UTC().String())
 
 	token := helpers.GenerateSecureToken()
-	repositories.UpdateToken(user, token)
+	ah.ur.UpdateToken(user, token)
 
 	ctx.JSON(http.StatusOK,
 		LoginResponse{Url: "wss://" + ctx.Request.Host + "/ws?token=" + token})

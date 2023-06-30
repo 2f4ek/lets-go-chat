@@ -2,14 +2,16 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 var minPasswordLength = 8
 var minLoginLength = 4
+var RHInstanse *RegisterHandler
 
 type CreateUserRequest struct {
 	UserName string `json:"userName"`
@@ -21,11 +23,22 @@ type CreateUserResponse struct {
 	Id       models.UserId `json:"id"`
 }
 
+type RegisterHandler struct {
+	ur *repositories.UserRepository
+}
+
+func ProvideRegisterHandler(ur *repositories.UserRepository) *RegisterHandler {
+	once.Do(func() {
+		RHInstanse = &RegisterHandler{ur: ur}
+	})
+	return RHInstanse
+}
+
 func (r *CreateUserRequest) Validate() bool {
 	return len(r.UserName) > minLoginLength && len(r.Password) > minPasswordLength
 }
 
-func RegisterUser(ctx *gin.Context) {
+func (r *RegisterHandler) RegisterUser(ctx *gin.Context) {
 	userRequest := &CreateUserRequest{}
 	if err := ctx.Bind(userRequest); err != nil {
 		ctx.String(http.StatusBadRequest, "Bad request, empty username or id")
@@ -41,13 +54,13 @@ func RegisterUser(ctx *gin.Context) {
 		return
 	}
 
-	user, userExists := repositories.CreateUser(userRequest.UserName, userRequest.Password)
+	user, userExists := r.ur.CreateUser(userRequest.UserName, userRequest.Password)
 	if userExists == true {
 		ctx.String(http.StatusBadRequest, "User name already taken")
 		return
 	}
 
-	repositories.AppendUser(*user)
+	r.ur.AppendUser(*user)
 
 	ctx.JSON(201, CreateUserResponse{UserName: user.Name, Id: user.Id})
 }

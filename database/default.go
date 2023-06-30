@@ -2,14 +2,25 @@ package database
 
 import (
 	"fmt"
+	"os"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
 )
 
-var Database *gorm.DB
+type Database struct {
+	Database *gorm.DB
+}
 
-func Connect() {
+func ProvideDatabase() *Database {
+	return &Database{}
+}
+
+func (db *Database) GetDatabase() *gorm.DB {
+	return db.Database
+}
+
+func (db *Database) Connect() {
 	var err error
 	host := os.Getenv("DB_HOST")
 	username := os.Getenv("DB_USER")
@@ -18,7 +29,7 @@ func Connect() {
 	port := os.Getenv("DB_PORT")
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Africa/Lagos", host, username, password, databaseName, port)
-	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db.Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		panic(err)
