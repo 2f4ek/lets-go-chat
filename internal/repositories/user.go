@@ -1,17 +1,11 @@
 package repositories
 
 import (
-	"sync"
 	"time"
 
 	"github.com/2f4ek/lets-go-chat/internal/helpers"
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/pkg/hasher"
-)
-
-var (
-	URInstance *UserRepository
-	once       sync.Once
 )
 
 type IUserRepository interface {
@@ -29,11 +23,7 @@ type UserRepository struct {
 }
 
 func ProvideUserRepository() *UserRepository {
-	once.Do(func() {
-		URInstance = &UserRepository{}
-		URInstance.users = make(map[models.UserId]models.User)
-	})
-	return URInstance
+	return &UserRepository{users: make(map[models.UserId]models.User)}
 }
 
 func (rep *UserRepository) AppendUser(user models.User) {

@@ -2,14 +2,12 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
-	"sync"
-
 	"github.com/2f4ek/lets-go-chat/internal/chatModels"
 	"github.com/2f4ek/lets-go-chat/internal/models"
 	"github.com/2f4ek/lets-go-chat/internal/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"net/http"
 )
 
 type IChatHandler interface {
@@ -24,19 +22,14 @@ type ChatHandler struct {
 }
 
 var (
-	CInstance *ChatHandler
-	once      sync.Once
-	upgrader  = websocket.Upgrader{
+	upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
 )
 
 func ProvideChatHandler(ur *repositories.UserRepository, chat *chatModels.Chat) *ChatHandler {
-	once.Do(func() {
-		CInstance = &ChatHandler{ur: ur, chat: chat}
-	})
-	return CInstance
+	return &ChatHandler{ur: ur, chat: chat}
 }
 
 func (ch *ChatHandler) InitChat() *chatModels.Chat {

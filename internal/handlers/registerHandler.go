@@ -11,7 +11,6 @@ import (
 
 var minPasswordLength = 8
 var minLoginLength = 4
-var RHInstance *RegisterHandler
 
 type ICreateUserRequest interface {
 	Validate() bool
@@ -44,10 +43,7 @@ type RegisterHandler struct {
 }
 
 func ProvideRegisterHandler(ur *repositories.UserRepository) *RegisterHandler {
-	once.Do(func() {
-		RHInstance = &RegisterHandler{ur: ur}
-	})
-	return RHInstance
+	return &RegisterHandler{ur: ur}
 }
 
 func (r *CreateUserRequest) Validate() bool {
