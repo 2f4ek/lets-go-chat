@@ -11,8 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var AHInstance *AuthHandler
-
 type IAuthHandler interface {
 	LoginUser(ctx *gin.Context)
 }
@@ -42,10 +40,7 @@ type LoginResponse struct {
 }
 
 func ProvideAuthHandler(ur *repositories.UserRepository) *AuthHandler {
-	once.Do(func() {
-		AHInstance = &AuthHandler{ur: ur}
-	})
-	return AHInstance
+	return &AuthHandler{ur: ur}
 }
 
 func (r *LoginRequest) validate() bool {
